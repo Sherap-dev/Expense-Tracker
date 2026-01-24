@@ -1,41 +1,92 @@
 import os
+from datetime import datetime
 
 # expense_list = []
 expense_list = [
-    {"expense_type": "Rice", "amount": 1200.0, "category": "Food & Groceries"},
-    {"expense_type": "Milk", "amount": 180.0, "category": "Food & Groceries"},
-    {"expense_type": "Bus Pass", "amount": 500.0, "category": "Transport"},
-    {"expense_type": "Petrol", "amount": 1500.0, "category": "Transport"},
-    {"expense_type": "Monthly Rent", "amount": 12000.0, "category": "Rent / Housing"},
+    {
+        "expense_type": "Rice",
+        "amount": 1200.0,
+        "category": "Food & Groceries",
+        "date": "2026-01-02",
+    },
+    {
+        "expense_type": "Milk",
+        "amount": 180.0,
+        "category": "Food & Groceries",
+        "date": "2026-01-03",
+    },
+    {
+        "expense_type": "Bus Pass",
+        "amount": 500.0,
+        "category": "Transport",
+        "date": "2026-01-01",
+    },
+    {
+        "expense_type": "Petrol",
+        "amount": 1500.0,
+        "category": "Transport",
+        "date": "2026-01-06",
+    },
+    {
+        "expense_type": "Monthly Rent",
+        "amount": 12000.0,
+        "category": "Rent / Housing",
+        "date": "2026-01-01",
+    },
     {
         "expense_type": "Electricity Bill",
         "amount": 850.0,
         "category": "Bills & Utilities",
+        "date": "2026-01-05",
     },
     {
         "expense_type": "Internet Recharge",
         "amount": 999.0,
         "category": "Bills & Utilities",
+        "date": "2026-01-10",
     },
     {
         "expense_type": "Doctor Visit",
         "amount": 600.0,
         "category": "Healthcare / Medical",
+        "date": "2026-01-08",
     },
-    {"expense_type": "Movie Ticket", "amount": 350.0, "category": "Entertainment"},
+    {
+        "expense_type": "Movie Ticket",
+        "amount": 350.0,
+        "category": "Entertainment",
+        "date": "2026-01-12",
+    },
     {
         "expense_type": "Python Course",
         "amount": 2000.0,
         "category": "Education / Learning",
+        "date": "2026-01-15",
     },
-    {"expense_type": "Jeans", "amount": 1800.0, "category": "Shopping / Clothing"},
-    {"expense_type": "Weekend Trip", "amount": 4500.0, "category": "Travel / Vacation"},
+    {
+        "expense_type": "Jeans",
+        "amount": 1800.0,
+        "category": "Shopping / Clothing",
+        "date": "2026-01-18",
+    },
+    {
+        "expense_type": "Weekend Trip",
+        "amount": 4500.0,
+        "category": "Travel / Vacation",
+        "date": "2026-01-20",
+    },
     {
         "expense_type": "Mutual Fund SIP",
         "amount": 3000.0,
         "category": "Savings / Investments",
+        "date": "2026-01-25",
     },
-    {"expense_type": "Gift", "amount": 700.0, "category": "Miscellaneous / Others"},
+    {
+        "expense_type": "Gift",
+        "amount": 700.0,
+        "category": "Miscellaneous / Others",
+        "date": "2026-01-28",
+    },
 ]
 
 
@@ -64,33 +115,32 @@ def add_expense(expense):
             print(f"{i}: {cat}")
         print("-" * 30)
         try:
-            choice = int(
-                input("Enter A Number To Choose A Category. To Go Back Enter '0': ")
-            )
+            choice = int(input("Enter A Number To Choose A Category. To Go Back Enter '0': "))
             if choice == 0:
                 break
             if 1 <= choice <= len(categories):
                 category_choice = categories[choice - 1]
                 while True:
                     try:
-                        type = input(
-                            f"\nType of {category_choice}. To Go Back type 'yes': "
-                        )
+                        dates = input(f"\nType The Date Of This Expense in YYYY-MM-DD. To Go Back Enter 'yes': ")
+                        if dates.lower() == "yes":
+                            break
+                        try:
+                            datetime.strptime(dates, "%Y-%m-%d")
+                        except ValueError:
+                            print("Please Enter A Valid Date In 'YYYY-MM-DD' Format.")
+                            continue
 
+                        type = input(f"\nType of {category_choice}. To Go Back type 'yes': ")
                         if type.lower() == "yes":
                             break
 
-                        amount = float(
-                            input("\nEnter Amount Spent or Enter 0 to go back: ")
-                        )
+                        amount = float(input("\nEnter Amount Spent or Enter 0 to go back: "))
                         if amount == 0:
+                            print(expense_list)
                             break
 
-                        category_expense = {
-                            "type": type,
-                            "amount": amount,
-                            "category": category_choice,
-                        }
+                        category_expense = {"type": type, "amount": amount, "category": category_choice, "date": dates}
                         expense_list.append(category_expense)
 
                     except ValueError:
@@ -106,12 +156,11 @@ def all_expenses(expense_list):
     category_width = max(len(e["category"]) for e in expense_list)
     type_width = max(len(t["expense_type"]) for t in expense_list)
     amount_width = max(len(f"{e['amount']:.2f}") for e in expense_list)
-    columns = 4
+    dates_width = len("yyyy-mm-dd")
+    columns = 5
     column_padding = 3
     total_padding = columns * column_padding
-    total_width = (
-        coun_width + category_width + type_width + amount_width + total_padding
-    )
+    total_width = coun_width + category_width + type_width + dates_width + amount_width + total_padding
     dashes = "-" * total_width
 
     print("All Expenses:")
@@ -123,13 +172,15 @@ def all_expenses(expense_list):
         + "|".center(column_padding)
         + "Type".ljust(type_width)
         + "|".center(column_padding)
+        + "Dates".ljust(dates_width)
+        + "|".center(column_padding)
         + "Amount".ljust(amount_width)
     )
     print(dashes)
     while True:
         for i, expense in enumerate(expense_list, 1):
             print(
-                f"{i:<{coun_width}}{'|':^{column_padding}}{expense["category"]:<{category_width}}{'|':^{column_padding}}{expense["expense_type"]:<{type_width}}{'|':^{column_padding}}{expense["amount"]:>{amount_width}.2f} "
+                f"{i:<{coun_width}}{'|':^{column_padding}}{expense["category"]:<{category_width}}{'|':^{column_padding}}{expense["expense_type"]:<{type_width}}{'|':^{column_padding}}{expense["date"]:<{dates_width}}{'|':^{column_padding}}{expense["amount"]:>{amount_width}.2f} "
             )
         print(dashes)
         total = sum(a["amount"] for a in expense_list)
