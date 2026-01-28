@@ -220,6 +220,136 @@ def expenses_category(expense_list):
             break
 
 
+def expense_by_date(expense_list):
+    dates = {}
+    while True:
+        for expense in expense_list:
+            # building dict. amount of the same dates gets calculated
+            if expense["date"] not in dates:
+                dates[expense["date"]] = expense["amount"]
+            else:
+                dates[expense["date"]] += expense["amount"]
+            # sorting based on the dates in ascending order
+        sorted_dict = dict(sorted(dates.items()))
+        dates_width = max(len(d) for d in sorted_dict.keys())
+        amount_width = max(len(f"{a:.2f}") for a in sorted_dict.values())
+        padding = 3
+        total_width = dates_width + amount_width + padding
+
+        print("Expenses By Dates:")
+        print("=" * total_width)
+        print(f"{'Dates':<{dates_width}}{'|':^{padding}}{'Amount':<{amount_width}}")
+        print("-" * total_width)
+
+        for i, d in enumerate(sorted_dict.items()):
+            date = d[0]
+            amount = d[1]
+            print(f"{date:<{dates_width}}{'|':^{padding}}{amount:>{amount_width}.2f}")
+        print("-" * total_width)
+        total = sum(t for t in sorted_dict.values())
+        print(f"Total Expense: {total:.2f}")
+        user_input = input("To Return Back To Menu Enter 'yes': ")
+        if user_input.lower() == "yes":
+            break
+
+
+def show_expenses(expense_list):
+    coun_width = len(str(len(expense_list)))
+    category_width = max(len(e["category"]) for e in expense_list)
+    type_width = max(len(t["expense_type"]) for t in expense_list)
+    amount_width = max(len(f"{e['amount']:.2f}") for e in expense_list)
+    dates_width = len("yyyy-mm-dd")
+    columns = 5
+    column_padding = 3
+    total_padding = columns * column_padding
+    total_width = coun_width + category_width + type_width + dates_width + amount_width + total_padding
+    dashes = "-" * total_width
+
+    print("All Expenses:")
+    print(dashes)
+    print(
+        "NO".ljust(coun_width)
+        + "|".center(column_padding)
+        + "Category".ljust(category_width)
+        + "|".center(column_padding)
+        + "Type".ljust(type_width)
+        + "|".center(column_padding)
+        + "Dates".ljust(dates_width)
+        + "|".center(column_padding)
+        + "Amount".ljust(amount_width)
+    )
+    print(dashes)
+
+    for i, expense in enumerate(expense_list, 1):
+        print(
+            f"{i:<{coun_width}}{'|':^{column_padding}}{expense["category"]:<{category_width}}{'|':^{column_padding}}{expense["expense_type"]:<{type_width}}{'|':^{column_padding}}{expense["date"]:<{dates_width}}{'|':^{column_padding}}{expense["amount"]:>{amount_width}.2f} "
+        )
+    print(dashes)
+    total = sum(a["amount"] for a in expense_list)
+    print(f"Total Expense: {total:.2f}")
+    print(dashes)
+
+
+def edit_expense(expense_list):
+    show_expenses(expense_list)
+    print()
+    while True:
+        try:
+            expense_choice = int(input("Enter The No. Of The Expense You Would Like To Edit: "))
+
+            if 1 <= expense_choice <= len(expense_list):
+                current_choice = expense_list[expense_choice - 1]
+
+            num_width = len(str(expense_choice))
+            category_width = len(current_choice["category"])
+            type_width = len(current_choice["expense_type"])
+            date_width = 10
+            amt_width = len(f"{current_choice["amount"]:.2f}")
+            padding = 3
+            total_width = category_width + type_width + date_width + amt_width + (padding * 4)
+            print()
+            print("What Would You Like To Edit?")
+            print("-" * total_width)
+            print(
+                f"{'Category':<{category_width}}{'|':^{padding}}{'Type':<{type_width}}{'|':^{padding}}{'Dates':<{date_width}}{'|':^{padding}}{'Amount':<{amt_width}}"
+            )
+            print(
+                f"{current_choice['category']:<{category_width}}{'|':^{padding}}{current_choice['expense_type']:<{type_width}}{'|':^{padding}}{current_choice['date']:<{date_width}}{'|':^{padding}}{current_choice['amount']:>{amt_width}}"
+            )
+            print()
+            while True:
+                user_choice = input("Enter The Name Of The Category To Update it: ")
+                print()
+                if user_choice in ["Category", "Type", "Dates"]:
+                    user_update = input(
+                        f"Enter The New '{user_choice}' To Update. To choose another expense to edit enter 'Yes'. To go back to main menu Enter 'Menu': "
+                    )
+                    print()
+                    if user_update.lower() == "yes":
+                        break
+                    elif user_update.lower() == "menu":
+                        return
+                else:
+                    print("Please Enter A Valid Category")
+                    continue
+
+                if user_choice == "Category":
+                    current_choice["category"] = user_update
+                    continue
+                elif user_choice == "Type":
+                    current_choice["expense_type"] = user_update
+                    continue
+                elif user_choice == "Dates":
+                    current_choice["date"] = user_update
+                    continue
+                elif user_choice == "amount":
+                    current_choice["amount"] = float(input("Enter The New 'Amount' to Update: "))
+
+        except ValueError:
+            print("Please Enter A Valid Number")
+            continue
+
+
 def main_menu():
 
     menu_items = [
@@ -236,7 +366,7 @@ def main_menu():
         "Exit",
     ]
 
-    functions = {1: add_expense, 2: all_expenses, 3: expenses_category}
+    functions = {1: add_expense, 2: all_expenses, 3: expenses_category, 4: expense_by_date, 5: edit_expense}
 
     while True:
         print("=" * 30)
