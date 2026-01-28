@@ -290,6 +290,25 @@ def show_expenses(expense_list):
     print(dashes)
 
 
+def current_choice_display(current_choice):
+    category_width = len(current_choice["category"])
+    type_width = len(current_choice["expense_type"])
+    date_width = 10
+    amt_width = len(f"{current_choice["amount"]:.2f}")
+    padding = 3
+    total_width = category_width + type_width + date_width + amt_width + (padding * 4)
+    print()
+    print("Expense Update")
+    print("-" * total_width)
+    print(
+        f"{'Category':<{category_width}}{'|':^{padding}}{'Type':<{type_width}}{'|':^{padding}}{'Date':<{date_width}}{'|':^{padding}}{'Amount':<{amt_width}}"
+    )
+    print(
+        f"{current_choice['category']:<{category_width}}{'|':^{padding}}{current_choice['expense_type']:<{type_width}}{'|':^{padding}}{current_choice['date']:<{date_width}}{'|':^{padding}}{current_choice['amount']:>{amt_width}}"
+    )
+    print()
+
+
 def edit_expense(expense_list):
     show_expenses(expense_list)
     print()
@@ -300,50 +319,47 @@ def edit_expense(expense_list):
             if 1 <= expense_choice <= len(expense_list):
                 current_choice = expense_list[expense_choice - 1]
 
-            num_width = len(str(expense_choice))
-            category_width = len(current_choice["category"])
-            type_width = len(current_choice["expense_type"])
-            date_width = 10
-            amt_width = len(f"{current_choice["amount"]:.2f}")
-            padding = 3
-            total_width = category_width + type_width + date_width + amt_width + (padding * 4)
-            print()
-            print("What Would You Like To Edit?")
-            print("-" * total_width)
-            print(
-                f"{'Category':<{category_width}}{'|':^{padding}}{'Type':<{type_width}}{'|':^{padding}}{'Dates':<{date_width}}{'|':^{padding}}{'Amount':<{amt_width}}"
-            )
-            print(
-                f"{current_choice['category']:<{category_width}}{'|':^{padding}}{current_choice['expense_type']:<{type_width}}{'|':^{padding}}{current_choice['date']:<{date_width}}{'|':^{padding}}{current_choice['amount']:>{amt_width}}"
-            )
-            print()
+            current_choice_display(current_choice)
+
             while True:
-                user_choice = input("Enter The Name Of The Category To Update it: ")
+                user_choice = input("Enter The Name Of The Category To Update it: ").lower()
                 print()
-                if user_choice in ["Category", "Type", "Dates"]:
+                if user_choice in ["category", "date"]:
                     user_update = input(
-                        f"Enter The New '{user_choice}' To Update. To choose another expense to edit enter 'Yes'. To go back to main menu Enter 'Menu': "
+                        f"Enter The New '{user_choice.title()}' To Update. To choose another expense to edit enter 'Yes'. To go back to main menu Enter 'Menu': "
                     )
                     print()
                     if user_update.lower() == "yes":
                         break
                     elif user_update.lower() == "menu":
                         return
+
+                    current_choice[user_choice] = user_update
+                    print(f"{user_choice.title()} updated!")
+                    print(current_choice)
+                    current_choice_display(current_choice)
+
+                elif user_choice == "amount":
+                    while True:
+                        try:
+                            user_choice = float(input("Enter The New 'Amount' to Update: "))
+                            current_choice["amount"] = user_choice
+                            print(f"{user_choice.title()} updated!")
+                            current_choice_display(current_choice)
+                            break
+                        except ValueError:
+                            print("Please enter a valid amount")
+                            continue
+                elif user_choice == "type":
+                    user_update = input(
+                        f"Enter The New '{user_choice.title()}' To Update. To choose another expense to edit enter 'Yes'. To go back to main menu Enter 'Menu': "
+                    )
+                    current_choice["expense_type"] = user_update
+                    current_choice_display(current_choice)
+                    continue
                 else:
                     print("Please Enter A Valid Category")
                     continue
-
-                if user_choice == "Category":
-                    current_choice["category"] = user_update
-                    continue
-                elif user_choice == "Type":
-                    current_choice["expense_type"] = user_update
-                    continue
-                elif user_choice == "Dates":
-                    current_choice["date"] = user_update
-                    continue
-                elif user_choice == "amount":
-                    current_choice["amount"] = float(input("Enter The New 'Amount' to Update: "))
 
         except ValueError:
             print("Please Enter A Valid Number")
