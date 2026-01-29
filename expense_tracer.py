@@ -254,10 +254,17 @@ def expense_by_date(expense_list):
 
 
 def show_expenses(expense_list):
-    coun_width = len(str(len(expense_list)))
-    category_width = max(len(e["category"]) for e in expense_list)
-    type_width = max(len(t["expense_type"]) for t in expense_list)
-    amount_width = max(len(f"{e['amount']:.2f}") for e in expense_list)
+    if len(expense_list) == 0:
+        coun_width = 2
+        category_width = len("category")
+        type_width = len("type")
+        amount_width = len("amount")
+    else:
+        coun_width = len(str(len(expense_list)))
+        category_width = max(len(e["category"]) for e in expense_list)
+        type_width = max(len(t["expense_type"]) for t in expense_list)
+        amount_width = max(len(f"{e['amount']:.2f}") for e in expense_list)
+
     dates_width = len("yyyy-mm-dd")
     columns = 5
     column_padding = 3
@@ -280,14 +287,23 @@ def show_expenses(expense_list):
     )
     print(dashes)
 
-    for i, expense in enumerate(expense_list, 1):
+    if len(expense_list) != 0:
+        for i, expense in enumerate(expense_list, 1):
+            print(
+                f"{i:<{coun_width}}{'|':^{column_padding}}{expense["category"]:<{category_width}}{'|':^{column_padding}}{expense["expense_type"]:<{type_width}}{'|':^{column_padding}}{expense["date"]:<{dates_width}}{'|':^{column_padding}}{expense["amount"]:>{amount_width}.2f} "
+            )
+        print(dashes)
+        total = sum(a["amount"] for a in expense_list)
+        print(f"Total Expense: {total:.2f}")
+        print(dashes)
+    else:
         print(
-            f"{i:<{coun_width}}{'|':^{column_padding}}{expense["category"]:<{category_width}}{'|':^{column_padding}}{expense["expense_type"]:<{type_width}}{'|':^{column_padding}}{expense["date"]:<{dates_width}}{'|':^{column_padding}}{expense["amount"]:>{amount_width}.2f} "
+            f"{'0':<{coun_width}}{'|':^{column_padding}}{'N/A':<{category_width}}{'|':^{column_padding}}{'N/A':<{type_width}}{'|':^{column_padding}}{'N/A':<{dates_width}}{'|':^{column_padding}}{'N/A':>{amount_width}.2f} "
         )
-    print(dashes)
-    total = sum(a["amount"] for a in expense_list)
-    print(f"Total Expense: {total:.2f}")
-    print(dashes)
+        print(dashes)
+        total = 0
+        print(f"Total Expense: {total:.2f}")
+        print(dashes)
 
 
 def current_choice_display(current_choice):
@@ -319,13 +335,17 @@ def current_choice_display(current_choice):
     print()
 
 
-def edit_expense(expense_list):
-    show_expenses(expense_list)
-    print()
+def edit_delete_expense(expense_list):
+    dict_key = {"category": "category", "type": "expense_type", "dates": "date"}
+
     while True:
+        show_expenses(expense_list)
+        print()
         try:
             expense_choice = int(
-                input("Enter The No. Of The Expense You Would Like To Edit. To Go Back To Main Menu Enter '0': ")
+                input(
+                    "Enter The No. Of The Expense You Would Like To Edit Or Delete. To Go Back To Main Menu Enter '0': "
+                )
             )
 
             if expense_choice == 0:
@@ -333,28 +353,45 @@ def edit_expense(expense_list):
 
             if 1 <= expense_choice <= len(expense_list):
                 current_choice = expense_list[expense_choice - 1]
-
+            else:
+                print("Enter A Valid Number")
+                continue
             current_choice_display(current_choice)
 
             while True:
-                dict_key = {"category": "category", "type": "expense_type", "dates": "date"}
+
                 user_choice = input(
-                    "Enter The Name Of The Category To Update it. Enter 'list' To View All The Expenses: "
+                    "Enter 'del' To Delete This Expense Or Enter The Name Of The Category To Update it. Enter 'list' To View All The Expenses: "
                 ).lower()
+                print()
+                if user_choice == "del":
+                    print("!!Warning Deletion Is Not Undoable!!")
+                    print()
+                    user_input = input(
+                        "Are You Sure You Want to Delete This Entry? Enter 'yes' to delete 'no' to go back: "
+                    )
+                    if user_input == "yes":
+                        expense_list.remove(current_choice)
+                        print("\nEntry Deleted\n")
+                        break
+                    elif user_input == "no":
+                        break
+                    else:
+                        print("Please Enter A Valid confirmation key. 'yes' or 'no'")
+                        continue
 
                 if user_choice == "list":
-                    show_expenses(expense_list)
+                    # show_expenses(expense_list)
                     break
 
                 if user_choice in dict_key:
                     key = dict_key[user_choice]
-                    print()
                     user_update = input(
                         f"Enter The New '{user_choice.title()}' To Update. To choose another expense to edit enter 'Yes'. To go back to main menu Enter 'Menu': "
                     )
                     print()
                     if user_update.lower() == "yes":
-                        show_expenses(expense_list)
+                        # show_expenses(expense_list)
                         break
                     elif user_update.lower() == "menu":
                         return
@@ -392,6 +429,22 @@ def edit_expense(expense_list):
             continue
 
 
+def reset(expense_list):
+    while True:
+        show_expenses(expense_list)
+        print("\n!!!Warning!!! Reset Cannot Be Undone!!\n")
+        user_input = input("Are You Sure? Enter 'yes' to confirm 'no' to go back to menu: ")
+        if user_input.lower() == "yes":
+            expense_list.clear()
+            print("\nList Resetted")
+            show_expenses(expense_list)
+            return
+        elif user_input.lower() == "no":
+            return
+        else:
+            print("Enter a valid confirmation. 'yes' or 'no'")
+
+
 def main_menu():
 
     menu_items = [
@@ -399,8 +452,7 @@ def main_menu():
         "View All Expenses",
         "View Expenses by Category",
         "View Expenses by Date",
-        "Edit an Expense",
-        "Delete an Expense",
+        "Edit Or Delete an Expense",
         "View Total Expenses",
         "Set Budget",
         "Generate Summary Report",
@@ -408,7 +460,14 @@ def main_menu():
         "Exit",
     ]
 
-    functions = {1: add_expense, 2: all_expenses, 3: expenses_category, 4: expense_by_date, 5: edit_expense}
+    functions = {
+        1: add_expense,
+        2: all_expenses,
+        3: expenses_category,
+        4: expense_by_date,
+        5: edit_delete_expense,
+        9: reset,
+    }
 
     while True:
         print("=" * 30)
@@ -419,20 +478,18 @@ def main_menu():
         print("-" * 30)
 
         try:
-            choice = int(input("Enter A Number 1-11 To Enter A Menu Item.: "))
+            choice = int(input("Enter A Number 1-10 To Enter A Menu Item.: "))
 
-            if choice == 11:
+            if choice == 10:
                 os.system("cls" if os.name == "nt" else "clear")
                 print("!!!Thank You For Using Expense Tracker. Have A Nice Day!!!")
                 return
-
-            if 1 <= choice <= len(menu_items):
+            elif choice in functions:
                 functions[choice](expense_list)
             else:
                 raise ValueError
-
         except ValueError:
-            print("Enter A Valid Number: 1-11")
+            print("Enter A Valid Number: 1-10")
 
 
 main_menu()
