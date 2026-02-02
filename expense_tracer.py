@@ -2,6 +2,21 @@ import os
 from datetime import datetime
 
 # expense_list = []
+budgets = {
+    "Food & Groceries": 6000.0,
+    "Transport": 3000.0,
+    "Rent / Housing": 12000.0,
+    "Bills & Utilities": 2500.0,
+    "Healthcare / Medical": 2000.0,
+    "Entertainment": 1500.0,
+    "Education / Learning": 3000.0,
+    "Shopping / Clothing": 2500.0,
+    "Travel / Vacation": 5000.0,
+    "Savings / Investments": 3000.0,
+    "Miscellaneous / Others": 1000.0,
+}
+
+
 expense_list = [
     {
         "expense_type": "Rice",
@@ -140,7 +155,12 @@ def add_expense(expense):
                             print(expense_list)
                             break
 
-                        category_expense = {"type": type, "amount": amount, "category": category_choice, "date": dates}
+                        category_expense = {
+                            "expense_type": type,
+                            "amount": amount,
+                            "category": category_choice,
+                            "date": dates,
+                        }
                         expense_list.append(category_expense)
 
                     except ValueError:
@@ -189,7 +209,7 @@ def all_expenses(expense_list):
         while True:
             for i, expense in enumerate(expense_list, 1):
                 print(
-                    f"{i:<{coun_width}}{'|':^{column_padding}}{expense["category"]:<{category_width}}{'|':^{column_padding}}{expense["expense_type"]:<{type_width}}{'|':^{column_padding}}{expense["date"]:<{dates_width}}{'|':^{column_padding}}{expense["amount"]:>{amount_width}.2f} "
+                    f"{i:<{coun_width}}{'|':^{column_padding}}{expense['category']:<{category_width}}{'|':^{column_padding}}{expense['expense_type']:<{type_width}}{'|':^{column_padding}}{expense['date']:<{dates_width}}{'|':^{column_padding}}{expense['amount']:>{amount_width}.2f} "
                 )
             print(dashes)
             total = sum(a["amount"] for a in expense_list)
@@ -331,7 +351,7 @@ def show_expenses(expense_list):
 
         for i, expense in enumerate(expense_list, 1):
             print(
-                f"{i:<{coun_width}}{'|':^{column_padding}}{expense["category"]:<{category_width}}{'|':^{column_padding}}{expense["expense_type"]:<{type_width}}{'|':^{column_padding}}{expense["date"]:<{dates_width}}{'|':^{column_padding}}{expense["amount"]:>{amount_width}.2f} "
+                f"{i:<{coun_width}}{'|':^{column_padding}}{expense['category']:<{category_width}}{'|':^{column_padding}}{expense['expense_type']:<{type_width}}{'|':^{column_padding}}{expense['date']:<{dates_width}}{'|':^{column_padding}}{expense['amount']:>{amount_width}.2f} "
             )
         print(dashes)
         total = sum(a["amount"] for a in expense_list)
@@ -497,6 +517,94 @@ def view_total_expense(expense_list):
     all_expenses(expense_list)
 
 
+def set_budget(expense_list):
+    budget_category = [
+        "Food & Groceries",
+        "Transport",
+        "Rent / Housing",
+        "Bills & Utilities",
+        "Healthcare / Medical",
+        "Entertainment",
+        "Education / Learning",
+        "Shopping / Clothing",
+        "Travel / Vacation",
+        "Savings / Investments",
+        "Miscellaneous / Others",
+        "View Budget",
+    ]
+    while True:
+        category_width = max(len(c) for c in budget_category)
+        print("=" * category_width)
+        print("Set Budget:")
+        print("=" * category_width)
+        print("categories:")
+        print("-" * category_width)
+        for i, cat in enumerate(budget_category, 1):
+            print(f"{i}: {cat}")
+        try:
+            budget_choice = int(
+                input(
+                    "\nEnter The No. Of The Category From The List To Set The Budget Of, Enter '0' To Go Back To Main Menu: "
+                )
+            )
+            if budget_choice == 0:
+                return
+
+            if not (1 <= budget_choice <= len(budget_category)):
+                print("Enter A Valid No. From The List")
+                continue
+            else:
+                category_choice = budget_category[budget_choice - 1]
+
+            if category_choice == "View Budget":
+                while True:
+                    if not budgets:
+                        print("\n!!!No Budget Set Yet!!!\n")
+                        break
+                    else:
+                        cat_width = max(len(c) for c in budgets.keys())
+                        amount_width = max(len(f"{a:.2f}") for a in budgets.values())
+                        padding = 3
+                        total_Width = cat_width + amount_width + padding
+                        print("Budget:")
+                        print("-" * total_Width)
+                        print(f"{'Category':<{cat_width}}{'|':^{padding}}{'Amount':^{amount_width}}")
+                        print("-" * total_Width)
+                        for b, a in budgets.items():
+                            print(f"{b:<{cat_width}}{'|':^{padding}}{a:>{amount_width}.2f}")
+
+                        user_input = input(
+                            "\nEnter 'budget' To Go Back To Set Budget, Enter 'main menu' To Go Back To Main Menu: "
+                        )
+
+                        if user_input.lower() == "budget":
+                            break
+                        elif user_input.lower() == "main menu":
+                            return
+                        else:
+                            print("Enter A Valid Choice.")
+            else:
+                header = "Set Budget For"
+                total_Width = len(category_choice) + len(header)
+                print(f"\n{header} {category_choice}")
+                print("-" * total_Width)
+
+                while True:
+                    try:
+                        budget = float(input(f"Please Enter The Budget For {category_choice}: "))
+                        if budget < 0:
+                            print("Budget Amount Cannot Be Negative.")
+                            continue
+                        else:
+                            budgets[category_choice] = budget
+                            print("Budget Added")
+                            break
+                    except ValueError:
+                        print("Please Enter A Valid Value.")
+        except ValueError:
+            print("Enter A Valid Number.")
+
+
 def main_menu():
 
     menu_items = [
@@ -519,6 +627,7 @@ def main_menu():
         4: expense_by_date,
         5: edit_delete_expense,
         6: view_total_expense,
+        7: set_budget,
         9: reset,
     }
 
