@@ -18,46 +18,44 @@ Why OOP exists: Initially, I thought, “Why do I need OOP? I can just write fun
 
 This project might not have a flashy frontend or be perfect, and there might be some small bugs. But it’s honest work, and I’m proud of it.
 
-Usage
+Usage:
 
 Clone the repository:
 
-git clone <your-repo-url>
-cd <your-repo-folder>
+git clone {your-repo-url}
 
+cd {your-repo-folder}
 
 Run the program:
 
 python main.py
 
-
 Replace main.py with the filename of your main script if different.
 
 Follow the CLI prompts to:
 
-Add new expenses
-
-View all expenses
-
-View expenses by category or date
-
-Edit or delete expenses
-
-Set budgets
-
-Generate a summary report
-
-Reset all data
+  .Add new expenses
+  
+  .View all expenses
+  
+  .View expenses by category or date
+  
+  .Edit or delete expenses
+  
+  .Set budgets
+  
+  .Generate a summary report
+  
+  .Reset all data
 
 Input Notes:
-
 Dates should be entered in YYYY-MM-DD format.
 
 Amounts should be numeric (e.g., 120.50).
 
 Follow the instructions in the terminal carefully — the program guides you step by step.
 
-Features
+Features:
 
 CLI-based, easy-to-use interface
 
@@ -71,7 +69,7 @@ Generate summary reports with total and overall budget usage
 
 Reset all data if needed
 
-Future Plans (V2)
+Future Plans (V2):
 
 Refactor to Object-Oriented Programming (OOP)
 
@@ -79,6 +77,6 @@ Add advanced features like warnings when exceeding budget
 
 Possibly include a simple GUI
 
-License
+License:
 
 Feel free to use and modify this project. This is open, honest work shared for learning purposes
