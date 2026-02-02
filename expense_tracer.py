@@ -1,108 +1,8 @@
 import os
 from datetime import datetime
 
-# expense_list = []
-budgets = {
-    "Food & Groceries": 6000.0,
-    "Transport": 3000.0,
-    "Rent / Housing": 12000.0,
-    "Bills & Utilities": 2500.0,
-    "Healthcare / Medical": 2000.0,
-    "Entertainment": 1500.0,
-    "Education / Learning": 3000.0,
-    "Shopping / Clothing": 2500.0,
-    "Travel / Vacation": 5000.0,
-    "Savings / Investments": 3000.0,
-    "Miscellaneous / Others": 1000.0,
-}
-
-
-expense_list = [
-    {
-        "expense_type": "Rice",
-        "amount": 1200.0,
-        "category": "Food & Groceries",
-        "date": "2026-01-02",
-    },
-    {
-        "expense_type": "Milk",
-        "amount": 180.0,
-        "category": "Food & Groceries",
-        "date": "2026-01-03",
-    },
-    {
-        "expense_type": "Bus Pass",
-        "amount": 500.0,
-        "category": "Transport",
-        "date": "2026-01-01",
-    },
-    {
-        "expense_type": "Petrol",
-        "amount": 1500.0,
-        "category": "Transport",
-        "date": "2026-01-06",
-    },
-    {
-        "expense_type": "Monthly Rent",
-        "amount": 12000.0,
-        "category": "Rent / Housing",
-        "date": "2026-01-01",
-    },
-    {
-        "expense_type": "Electricity Bill",
-        "amount": 850.0,
-        "category": "Bills & Utilities",
-        "date": "2026-01-05",
-    },
-    {
-        "expense_type": "Internet Recharge",
-        "amount": 999.0,
-        "category": "Bills & Utilities",
-        "date": "2026-01-10",
-    },
-    {
-        "expense_type": "Doctor Visit",
-        "amount": 600.0,
-        "category": "Healthcare / Medical",
-        "date": "2026-01-08",
-    },
-    {
-        "expense_type": "Movie Ticket",
-        "amount": 350.0,
-        "category": "Entertainment",
-        "date": "2026-01-12",
-    },
-    {
-        "expense_type": "Python Course",
-        "amount": 2000.0,
-        "category": "Education / Learning",
-        "date": "2026-01-15",
-    },
-    {
-        "expense_type": "Jeans",
-        "amount": 1800.0,
-        "category": "Shopping / Clothing",
-        "date": "2026-01-18",
-    },
-    {
-        "expense_type": "Weekend Trip",
-        "amount": 4500.0,
-        "category": "Travel / Vacation",
-        "date": "2026-01-20",
-    },
-    {
-        "expense_type": "Mutual Fund SIP",
-        "amount": 3000.0,
-        "category": "Savings / Investments",
-        "date": "2026-01-25",
-    },
-    {
-        "expense_type": "Gift",
-        "amount": 700.0,
-        "category": "Miscellaneous / Others",
-        "date": "2026-01-28",
-    },
-]
+expense_list = []
+budgets = {}
 
 
 def add_expense(expense):
@@ -146,8 +46,8 @@ def add_expense(expense):
                             print("Please Enter A Valid Date In 'YYYY-MM-DD' Format.")
                             continue
 
-                        type = input(f"\nType of {category_choice}. To Go Back type 'yes': ")
-                        if type.lower() == "yes":
+                        _type = input(f"\nType of {category_choice}. To Go Back type 'yes': ")
+                        if _type.lower() == "yes":
                             break
 
                         amount = float(input("\nEnter Amount Spent or Enter 0 to go back: "))
@@ -156,7 +56,7 @@ def add_expense(expense):
                             break
 
                         category_expense = {
-                            "expense_type": type,
+                            "expense_type": _type,
                             "amount": amount,
                             "category": category_choice,
                             "date": dates,
@@ -251,7 +151,7 @@ def expenses_category(expense_list):
         print("View Expenses By Category:")
         print(dash)
         for cat, amt in category_expense_amt.items():
-            print(f"{cat:<{category_width}}{"|":^{padding}}{amt:>{amt_width}.2f}")
+            print(f"{cat:<{category_width}}{'|':^{padding}}{amt:>{amt_width}.2f}")
 
         user_input = input("To Go Back To Main Menu Enter 'yes' or 'y': ")
         if user_input.lower() == "yes" or user_input.lower() == "y":
@@ -363,7 +263,7 @@ def current_choice_display(current_choice):
 
     category_width = len(current_choice["category"])
     type_width = len(current_choice["expense_type"])
-    amt_width = len(f"{current_choice["amount"]:.2f}")
+    amt_width = len(f"{current_choice['amount']:.2f}")
 
     if (
         len(current_choice["category"]) < len("category")
@@ -606,64 +506,69 @@ def set_budget(expense_list):
 
 
 def summary_report(expense_list):
-    spent_per_category = {}
-    # aggrigating the amount
-    for expense in expense_list:
-        category = expense["category"]
-        amount = expense["amount"]
+    if len(expense_list) == 0 or len(budgets) == 0:
+        print("No Entries Done Yet")
+    else:
+        spent_per_category = {}
+        # aggrigating the amount
+        for expense in expense_list:
+            category = expense["category"]
+            amount = expense["amount"]
 
-        if category not in spent_per_category:
-            spent_per_category[category] = 0
+            if category not in spent_per_category:
+                spent_per_category[category] = 0
 
-        spent_per_category[category] += amount
-    # building the nested dictionary
-    summary = {}
-    for category, budget in budgets.items():
-        summary[category] = {"spent": spent_per_category.get(category, 0), "budget": budget}
+            spent_per_category[category] += amount
+        # building the nested dictionary
+        summary = {}
+        for category, budget in budgets.items():
+            summary[category] = {"spent": spent_per_category.get(category, 0), "budget": budget}
 
-    total_spent = 0
-    total_budget = 0
-    budget_usage = {}  # budget usage storing
-    for cat, elems in summary.items():
-        spent = elems["spent"]
-        buds = elems["budget"]
+        total_spent = 0
+        total_budget = 0
+        budget_usage = {}  # budget usage storing
+        for cat, elems in summary.items():
+            spent = elems["spent"]
+            buds = elems["budget"]
 
-        total_spent += spent
-        total_budget += buds
+            total_spent += spent
+            total_budget += buds
 
-        if buds != 0:
-            budget_usage[cat] = (spent / buds) * 100  # budget usage calculation
-        else:
-            budget_usage[cat] = 0
+            if buds != 0:
+                budget_usage[cat] = (spent / buds) * 100  # budget usage calculation
+            else:
+                budget_usage[cat] = 0
 
-    overall_usage = (total_spent / total_budget) * 100  # overall average budger usage calculation
+        overall_usage = (total_spent / total_budget) * 100  # overall average budger usage calculation
 
-    category_width = max(len(c) for c in summary.keys())
-    spent_width = len(f"{total_spent:.2f}")
-    budget_width = len(f"{total_budget:.2f}")
-    budget_usage_width = len("budget usage")
-    padding = 3
-    total_width = category_width + spent_width + budget_width + budget_usage_width + (padding * 4)
+        category_width = max(len(c) for c in summary.keys())
+        spent_width = len(f"{total_spent:.2f}")
+        budget_width = len(f"{total_budget:.2f}")
+        budget_usage_width = len("budget usage")
+        padding = 3
+        total_width = category_width + spent_width + budget_width + budget_usage_width + (padding * 4)
 
-    print("=" * total_width)
-    print("Summary Report:")
-    print("=" * total_width)
-    print(
-        f"{'Category':<{category_width}}{'|':^{padding}}{'Spent':^{spent_width}}{'|':^{padding}}{'Budget':^{budget_width}}{'|':^{padding}}{'Budget Usage':^{budget_usage_width}}"
-    )
-    print("-" * total_width)
-
-    for cat, elems in summary.items():
-        spent = elems["spent"]
-        budget = elems["budget"]
+        print("=" * total_width)
+        print("Summary Report:")
+        print("=" * total_width)
         print(
-            f"{cat:<{category_width}}{'|':^{padding}}{spent:>{spent_width}.2f}{'|':^{padding}}{budget:>{budget_width}.2f}{'|':^{padding}}{budget_usage[cat]:>{budget_usage_width}.2f} %"
+            f"{'Category':<{category_width}}{'|':^{padding}}{'Spent':^{spent_width}}{'|':^{padding}}{'Budget':^{budget_width}}{'|':^{padding}}{'Budget Usage':^{budget_usage_width}}"
         )
-    print("-" * total_width)
-    print(f"Total Spent: {total_spent}\nTotal budget: {total_budget}\nOverall Budget Usage: {overall_usage:.2f} %\n")
-    user_input = input("Enter Anything To Go Back: ")
-    if user_input:
-        return
+        print("-" * total_width)
+
+        for cat, elems in summary.items():
+            spent = elems["spent"]
+            budget = elems["budget"]
+            print(
+                f"{cat:<{category_width}}{'|':^{padding}}{spent:>{spent_width}.2f}{'|':^{padding}}{budget:>{budget_width}.2f}{'|':^{padding}}{budget_usage[cat]:>{budget_usage_width}.2f} %"
+            )
+        print("-" * total_width)
+        print(
+            f"Total Spent: {total_spent}\nTotal budget: {total_budget}\nOverall Budget Usage: {overall_usage:.2f} %\n"
+        )
+        user_input = input("Enter Anything To Go Back: ")
+        if user_input:
+            return
 
 
 def main_menu():
@@ -695,7 +600,7 @@ def main_menu():
 
     while True:
         print("=" * 30)
-        print("Expense Calculator")
+        print("Expense Tracker")
         print("=" * 30)
         for i, item in enumerate(menu_items, 1):
             print(f"{i}: {item}")
