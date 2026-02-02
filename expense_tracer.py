@@ -605,6 +605,67 @@ def set_budget(expense_list):
             print("Enter A Valid Number.")
 
 
+def summary_report(expense_list):
+    spent_per_category = {}
+    # aggrigating the amount
+    for expense in expense_list:
+        category = expense["category"]
+        amount = expense["amount"]
+
+        if category not in spent_per_category:
+            spent_per_category[category] = 0
+
+        spent_per_category[category] += amount
+    # building the nested dictionary
+    summary = {}
+    for category, budget in budgets.items():
+        summary[category] = {"spent": spent_per_category.get(category, 0), "budget": budget}
+
+    total_spent = 0
+    total_budget = 0
+    budget_usage = {}  # budget usage storing
+    for cat, elems in summary.items():
+        spent = elems["spent"]
+        buds = elems["budget"]
+
+        total_spent += spent
+        total_budget += buds
+
+        if buds != 0:
+            budget_usage[cat] = (spent / buds) * 100  # budget usage calculation
+        else:
+            budget_usage[cat] = 0
+
+    overall_usage = (total_spent / total_budget) * 100  # overall average budger usage calculation
+
+    category_width = max(len(c) for c in summary.keys())
+    spent_width = len(f"{total_spent:.2f}")
+    budget_width = len(f"{total_budget:.2f}")
+    budget_usage_width = len("budget usage")
+    padding = 3
+    total_width = category_width + spent_width + budget_width + budget_usage_width + (padding * 4)
+
+    print("=" * total_width)
+    print("Summary Report:")
+    print("=" * total_width)
+    print(
+        f"{'Category':<{category_width}}{'|':^{padding}}{'Spent':^{spent_width}}{'|':^{padding}}{'Budget':^{budget_width}}{'|':^{padding}}{'Budget Usage':^{budget_usage_width}}"
+    )
+    print("-" * total_width)
+
+    for cat, elems in summary.items():
+        spent = elems["spent"]
+        budget = elems["budget"]
+        print(
+            f"{cat:<{category_width}}{'|':^{padding}}{spent:>{spent_width}.2f}{'|':^{padding}}{budget:>{budget_width}.2f}{'|':^{padding}}{budget_usage[cat]:>{budget_usage_width}.2f} %"
+        )
+    print("-" * total_width)
+    print(f"Total Spent: {total_spent}\nTotal budget: {total_budget}\nOverall Budget Usage: {overall_usage:.2f} %\n")
+    user_input = input("Enter Anything To Go Back: ")
+    if user_input:
+        return
+
+
 def main_menu():
 
     menu_items = [
@@ -628,6 +689,7 @@ def main_menu():
         5: edit_delete_expense,
         6: view_total_expense,
         7: set_budget,
+        8: summary_report,
         9: reset,
     }
 
